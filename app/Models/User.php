@@ -46,6 +46,12 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
+    /**
+     * Returns a new Attribute instance that will hash a given string value
+     * using PHP's bcrypt function.
+     *
+     * @return Attribute
+     */
     protected function password() :Attribute{
         return Attribute::make(
             set: fn(string $value) => bcrypt($value),
