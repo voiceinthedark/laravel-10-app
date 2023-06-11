@@ -4,18 +4,32 @@
             Avatar
         </h2>
 
-        <img class="w-32 h-32 rounded-full" src="{{ $user->avatar }}" alt="User Avatar">
+
 
         <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
             Add or update Avatar
         </p>
     </header>
 
+    <img class="w-32 h-32 rounded-full" src="{{ $user->avatar }}" alt="User Avatar">
+
     @if (session('message'))
         <div class="text-red-500">
             {{ session('message') }}
         </div>
     @endif
+
+    <form action="{{ route('profile.avatar.ai') }}" method="post" class="gap-4 mt-8" >
+        @csrf
+
+        <div class="flex items-center gap-4">
+            <x-primary-button>{{ __('Generate Avatar') }}</x-primary-button>
+        </div>
+
+    </form>
+
+    <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Or:</p>
+
     <form method="post" action="{{ route('profile.avatar') }}" class="mt-6 space-y-6" enctype="multipart/form-data">
         @csrf
         @method('patch')

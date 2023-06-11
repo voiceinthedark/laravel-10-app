@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateAvatarRequest;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Storage;
+use OpenAI\Laravel\Facades\OpenAI;
 
 class AvatarController extends Controller
 {
@@ -25,10 +26,21 @@ class AvatarController extends Controller
 
         // store the file in the public folder
         $file = $request->file('avatar')->store('avatars', 'public');
-        $user->update(['avatar' => 'storage/' . $file ]);
+        $user->update(['avatar' => 'storage/' . $file]);
 
         // Redirect back to the page that made the request with a message indicating that the avatar was successfully changed
         return back()->with('message', 'Avatar Successfully changed!');
     }
 
+    public function generate()
+    {
+        $url = OpenAI::images()->create([
+            'prompt' => 'A laravel programmer avatar for user: ' . auth()->user()->name,
+            'n' => 1,
+            'size' => '256x256',
+            'response_format' => 'url',
+        ]);
+
+        return redirect($url->data[0]->url);
+    }
 }
