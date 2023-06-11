@@ -3,28 +3,21 @@
 namespace App\Http\Controllers\Profile;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UpdateAvatarRequest;
 use Illuminate\Http\Request;
 use App\Models\User;
 
 class AvatarController extends Controller
 {
     // Define a public function named 'update' that accepts a Request object as a parameter
-    public function update(Request $request)
+    public function update(UpdateAvatarRequest $request)
     {
-        // Validate the request
-        $validated = $request->validate([
-            'avatar' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-        ]);
-
-        // If not validated, return back with an error message
-        if (!$validated) {
-            return back()->withErrors($validated)->withInput();
-        }
-
         // Find the user that is currently authenticated and update their avatar with the new one sent in the request
         $user = User::find(auth()->user()->id);
-        $user->avatar = $request->avatar;
-        $user->save();
+
+        // store the file in the public folder
+        $file = $request->file('avatar')->store('avatars', 'public');
+        $user->update(['avatar' => storage_path('app/public/' . $file)]);
 
         // Redirect back to the page that made the request with a message indicating that the avatar was successfully changed
         return back()->with('message', 'Avatar Successfully changed!');
