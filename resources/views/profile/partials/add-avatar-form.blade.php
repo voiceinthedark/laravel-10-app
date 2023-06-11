@@ -4,6 +4,8 @@
             Avatar
         </h2>
 
+        <img class="w-32 h-32 rounded-full" src="{{ $user->avatar }}" alt="User Avatar">
+
         <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
             Add or update Avatar
         </p>

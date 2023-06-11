@@ -17,7 +17,8 @@ class AvatarController extends Controller
 
         // store the file in the public folder
         $file = $request->file('avatar')->store('avatars', 'public');
-        $user->update(['avatar' => storage_path('app/public/' . $file)]);
+        // dd($file);
+        $user->update(['avatar' => 'storage/' . $file ]);
 
         // Redirect back to the page that made the request with a message indicating that the avatar was successfully changed
         return back()->with('message', 'Avatar Successfully changed!');
