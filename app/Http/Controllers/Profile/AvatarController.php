@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateAvatarRequest;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\Storage;
 
 class AvatarController extends Controller
 {
@@ -15,9 +16,15 @@ class AvatarController extends Controller
         // Find the user that is currently authenticated and update their avatar with the new one sent in the request
         $user = User::find(auth()->user()->id);
 
+        // Check if avatar was already uploaded by this user and delete the avatar if so
+        // TODO: delete the file
+        if ($request->user()->avatar) {
+            // dd( url('/') . '/' . $request->user()->avatar);
+            Storage::delete(url('/') . '/' . $request->user()->avatar);
+        }
+
         // store the file in the public folder
         $file = $request->file('avatar')->store('avatars', 'public');
-        // dd($file);
         $user->update(['avatar' => 'storage/' . $file ]);
 
         // Redirect back to the page that made the request with a message indicating that the avatar was successfully changed
