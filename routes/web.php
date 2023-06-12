@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Profile\AvatarController;
 use App\Http\Controllers\ProfileController;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use Laravel\Socialite\Facades\Socialite;
 
@@ -34,14 +35,26 @@ Route::middleware('auth')->group(function () {
 
 
 
-Route::get('/auth/redirect', function () {
+Route::post('/auth/redirect', function () {
     return Socialite::driver('github')->redirect();
-});
+})->name('login.github');
 
 Route::get('/auth/callback', function () {
     $user = Socialite::driver('github')->user();
 
-    dd($user);
+    // Find the user in the database if it doesn't exist add it with the Github Auth, else return the user
+    $user = User::firstOrCreate([
+        'email' => $user->email,
+    ], [
+        'name' => $user->name,
+        'avatar' => $user->avatar,
+        'password' => 'password',
+    ]);
+
+    // Login the user
+    Auth::login($user);
+
+    return redirect()->route('dashboard');
 
     // $user->token
 });
