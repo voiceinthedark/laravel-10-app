@@ -17,16 +17,9 @@ class AvatarController extends Controller
         // Find the user that is currently authenticated and update their avatar with the new one sent in the request
         $user = User::find(auth()->user()->id);
 
-        // Check if avatar was already uploaded by this user and delete the avatar if so
-        // TODO: delete the file
-        if ($request->user()->avatar) {
-            // dd( url('/') . '/' . $request->user()->avatar);
-            Storage::delete(url('/') . '/' . $request->user()->avatar);
-        }
-
         // store the file in the public folder
-        $file = $request->file('avatar')->store('avatars', 'public');
-        $user->update(['avatar' => 'storage/' . $file]);
+        $path = $request->file('avatar')->storeAs('avatars', $request->user()->id . '.png', 'public');
+        $user->update(['avatar' => 'storage/' . $path]);
 
         // Redirect back to the page that made the request with a message indicating that the avatar was successfully changed
         return back()->with('message', 'Avatar Successfully changed!');
@@ -41,6 +34,16 @@ class AvatarController extends Controller
             'response_format' => 'url',
         ]);
 
-        return redirect($url->data[0]->url);
+        // get the content of the avatar ai generation
+        $contents = file_get_contents($url->data[0]->url);
+
+        // store the file in the public folder
+        Storage::disk('public')->put('avatars/' . auth()->user()->id . '.png', $contents);
+        // update the user avatar
+        $user = auth()->user();
+        $user->update(['avatar' => 'storage/avatars/' . $user->id . '.png']);
+
+        // redirect back to the profile page
+        return redirect()->route('profile.edit');
     }
 }
